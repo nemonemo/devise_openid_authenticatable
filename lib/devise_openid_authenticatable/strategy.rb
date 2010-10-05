@@ -99,17 +99,20 @@ class Devise::Strategies::OpenidAuthenticatable < base_class
     
     def fields
       return @fields unless @fields.nil?
-      
-      if axr = OpenID::AX::FetchResponse.from_success_response(provider_response)
-        @fields = axr.data
-      else
+
+      # Commenting this out for now because this code prefers AX to SREG, and myopenid.com 
+      #   successfully replies to AX, but its responses are empty.  In contrast, myopenid's SREG response
+      #   has actual correct metadata in it.
+      # if axr = OpenID::AX::FetchResponse.from_success_response(provider_response)
+      #   @fields = axr.data
+      # else
         provider_response.message.namespaces.each do |uri, ns_alias|
           if ns_alias.to_s == "sreg"
             @fields = provider_response.extension_response(uri, true)
             break
           end
         end
-      end
+      # end
       
       return @fields
     end
